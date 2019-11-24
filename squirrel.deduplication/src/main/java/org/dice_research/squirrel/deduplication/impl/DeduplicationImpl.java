@@ -28,6 +28,22 @@ public class DeduplicationImpl {
 
     public DeduplicationImpl(UriHashCustodian uriHashCustodian, AdvancedTripleBasedSink sink,
                              TripleComparator tripleComparator,TripleHashFunction tripleHashFunction){
+        this.uriHashCustodian = uriHashCustodian;
+        this.sink = sink;
+        this.tripleComparator = tripleComparator;
+        this.tripleHashFunction = tripleHashFunction;
+    }
+
+
+    public void handleNewUris(List<CrawleableUri> uris) {
+        for (CrawleableUri nextUri : uris) {
+            List<Triple> triples = sink.getTriplesForGraph(nextUri);
+            HashValue value = (new IntervalBasedMinHashFunction(2, tripleHashFunction).hash(triples));
+            nextUri.addData(Constants.URI_HASH_KEY, value);
+        }
+
+        compareNewUrisWithOldUris(uris);
+        uriHashCustodian.addHashValuesForUris(uris);
 
     }
 
@@ -58,23 +74,12 @@ public class DeduplicationImpl {
                     if (tripleComparator.triplesAreEqual(listOld, listNew)) {
                         // TODO: delete duplicate, this means Delete the triples from the new uris and
                         // replace them by a link to the old uris which has the same content
+
                         continue outer;
                     }
 
                 }
             }
         }
-    }
-
-    public void handleNewUris(List<CrawleableUri> uris) {
-        for (CrawleableUri nextUri : uris) {
-            List<Triple> triples = sink.getTriplesForGraph(nextUri);
-            HashValue value = (new IntervalBasedMinHashFunction(2, tripleHashFunction).hash(triples));
-            nextUri.addData(Constants.URI_HASH_KEY, value);
-        }
-
-        compareNewUrisWithOldUris(uris);
-        uriHashCustodian.addHashValuesForUris(uris);
-
     }
 }

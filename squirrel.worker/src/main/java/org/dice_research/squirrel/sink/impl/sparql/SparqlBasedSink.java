@@ -32,6 +32,8 @@ import org.apache.jena.sparql.modify.request.QuadAcc;
 import org.apache.jena.sparql.modify.request.QuadDataAcc;
 import org.apache.jena.sparql.modify.request.UpdateDataInsert;
 import org.apache.jena.sparql.modify.request.UpdateDeleteInsert;
+import org.apache.jena.update.UpdateAction;
+import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 import org.dice_research.squirrel.Constants;
@@ -60,7 +62,7 @@ public class SparqlBasedSink extends AbstractBufferingTripleBasedSink implements
 
     protected CrawleableUri metadataGraphUri = null;
 
-    protected SparqlBasedSink(QueryExecutionFactory queryExecFactory, UpdateExecutionFactory updateExecFactory) {
+    public SparqlBasedSink(QueryExecutionFactory queryExecFactory, UpdateExecutionFactory updateExecFactory) {
         this.queryExecFactory = queryExecFactory;
         this.updateExecFactory = updateExecFactory;
         setMetadataGraphUri(new CrawleableUri(Constants.DEFAULT_META_DATA_GRAPH_URI));
@@ -104,7 +106,7 @@ public class SparqlBasedSink extends AbstractBufferingTripleBasedSink implements
                 }
             };
             queryExecFactory = new QueryExecutionFactoryHttp(sparqlEndpointUrl, new DatasetDescription(),
-                    authenticator);
+                authenticator);
             updateExecFactory = new UpdateExecutionFactoryHttp(sparqlEndpointUrl, authenticator);
         } else {
             queryExecFactory = new QueryExecutionFactoryHttp(sparqlEndpointUrl);
@@ -163,7 +165,7 @@ public class SparqlBasedSink extends AbstractBufferingTripleBasedSink implements
             if (uri.equals(metadataGraphUri)) {
                 graph = NodeFactory.createURI(uri.getUri().toString());
             } else {
-                 graph = NodeFactory.createURI(getGraphId(uri));
+                graph = NodeFactory.createURI(getGraphId(uri));
             }
 
             UpdateDeleteInsert insert = new UpdateDeleteInsert();
@@ -171,14 +173,14 @@ public class SparqlBasedSink extends AbstractBufferingTripleBasedSink implements
             insert.setHasDeleteClause(false);
             QuadAcc quads = insert.getInsertAcc();
             for(Triple triple : triples){
-               quads.addQuad(new Quad(graph, triple));
+                quads.addQuad(new Quad(graph, triple));
             }
             quads.setGraph(graph);
             UpdateProcessor processor = updateExecFactory.createUpdateProcessor(
-                    new UpdateRequest(insert).toString()
+                new UpdateRequest(insert).toString()
                     .replaceAll("\\{\\}", ""
-                            + "{ SELECT * {OPTIONAL {?s ?p ?o} } LIMIT 1}")
-                    );
+                        + "{ SELECT * {OPTIONAL {?s ?p ?o} } LIMIT 1}")
+            );
             LOGGER.info("Storing " + triples.size() + " triples for URI: " + uri.getUri().toString());
             processor.execute();
         } catch (Exception e) {
@@ -210,6 +212,12 @@ public class SparqlBasedSink extends AbstractBufferingTripleBasedSink implements
         this.metadataGraphUri = metadataGraphUri;
         // open new meta data sink
         openSinkForUri(metadataGraphUri);
+    }
+
+    public void removeTriplesForGraph(CrawleableUri uri){
+        String querybuilder = "DROP GRAPH <"+ SparqlBasedSink.getGraphId(uri) +"> ;";
+        UpdateRequest request = UpdateFactory.create(querybuilder.toString());
+        updateExecFactory.createUpdateProcessor(request).execute();
     }
 
     @Override

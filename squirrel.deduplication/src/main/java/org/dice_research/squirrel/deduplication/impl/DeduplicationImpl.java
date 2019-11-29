@@ -24,7 +24,7 @@ public class DeduplicationImpl {
 
     private TripleHashFunction tripleHashFunction;
 
-    public DeduplicationImpl(UriHashCustodian uriHashCustodian, AdvancedTripleBasedSink sink,
+    public DeduplicationImpl(AdvancedTripleBasedSink sink,
                              TripleComparator tripleComparator,TripleHashFunction tripleHashFunction){
         this.uriHashCustodian = uriHashCustodian;
         this.sink = sink;
@@ -47,7 +47,18 @@ public class DeduplicationImpl {
         for (CrawleableUri uri : uris) {
             hashValuesOfNewUris.add((HashValue) uri.getData(Constants.URI_HASH_KEY));
         }
-        Set<CrawleableUri> oldUrisForComparison = uriHashCustodian.getUrisWithSameHashValues(hashValuesOfNewUris);
+
+        Set<CrawleableUri> oldUrisForComparison = new HashSet<>();
+//        uriHashCustodian.getUrisWithSameHashValues(hashValuesOfNewUris);
+//        Set<CrawleableUri> oldUrisForComparison = new HashSet<>();
+//        for (CrawleableUri uri : uris) {
+//            oldUrisForComparison.add(uri);
+//        }
+        for(CrawleableUri uri:uris){
+            oldUrisForComparison.add(uri);
+        }
+
+
         for (CrawleableUri uriNew : uris) {
             for (CrawleableUri uriOld : oldUrisForComparison) {
                 if (!uriOld.equals(uriNew)) {
@@ -55,41 +66,29 @@ public class DeduplicationImpl {
                     List<Triple> listOld = sink.getTriplesForGraph(uriOld);
                     List<Triple> listNew = sink.getTriplesForGraph(uriNew);
 
-//                    for(Triple triple: listNew) {
-//                        sink.delete();
-//                    }
-//                    listOld.get(0).
-
                     if (tripleComparator.triplesAreEqual(listOld, listNew)) {
                         // TODO: delete duplicate, this means Delete the triples from the new uris and
                         // replace them by a link to the old uris which has the same content
-
-//                        uriOld.setData();
-
-                        addToMetadata();
-                        break;
+                        sink.removeTriplesForGraph(uriNew);
                     }
                 }
             }
         }
     }
 
-    private void addToMetadata() {
-    }
-
-    private void deleteDuplicateUri() {
-
-    }
 
     public void handleNewUris(List<CrawleableUri> uris) {
+
         for (CrawleableUri nextUri : uris) {
             List<Triple> triples = sink.getTriplesForGraph(nextUri);
             HashValue value = (new IntervalBasedMinHashFunction(2, tripleHashFunction).hash(triples));
             nextUri.addData(Constants.URI_HASH_KEY, value);
         }
 
+
         compareNewUrisWithOldUris(uris);
-        uriHashCustodian.addHashValuesForUris(uris);
+//        uriHashCustodian.addHashValuesForUris(uris);
+
 
     }
 }

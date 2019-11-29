@@ -27,4 +27,6 @@ public interface AdvancedTripleBasedSink extends TripleBasedSink {
      * @param triples {@link Triple}s to be sent to the database.
      */
     void sendTriples(CrawleableUri uri, Collection<Triple> triples);
+
+    void removeTriplesForGraph(CrawleableUri uri);
 }

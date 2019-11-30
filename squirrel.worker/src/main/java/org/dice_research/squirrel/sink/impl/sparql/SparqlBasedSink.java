@@ -118,11 +118,11 @@ public class SparqlBasedSink extends AbstractBufferingTripleBasedSink implements
     @Override
     public List<Triple> getTriplesForGraph(CrawleableUri uri) {
         Query selectQuery = null;
-        // if (uri.equals(metaDataGraphUri)) {
+         if (uri.equals(metadataGraphUri)) {
         selectQuery = QueryGenerator.getInstance().getSelectQuery();
-        // } else {
-        // selectQuery = QueryGenerator.getInstance().getSelectQuery(getGraphId(uri));
-        // }
+         } else {
+         selectQuery = QueryGenerator.getInstance().getSelectQuery(getGraphId(uri));
+         }
 
         QueryExecution qe = queryExecFactory.createQueryExecution(selectQuery);
         ResultSet rs = qe.execSelect();

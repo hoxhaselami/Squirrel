@@ -10,6 +10,7 @@ import org.dice_research.squirrel.deduplication.hashing.UriHashCustodian;
 import org.dice_research.squirrel.deduplication.hashing.impl.IntervalBasedMinHashFunction;
 import org.dice_research.squirrel.sink.tripleBased.AdvancedTripleBasedSink;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,6 +24,8 @@ public class DeduplicationImpl {
     private TripleComparator tripleComparator;
 
     private TripleHashFunction tripleHashFunction;
+
+    private HashMap<CrawleableUri,HashValue> hashes = new HashMap<>();
 
     public DeduplicationImpl(AdvancedTripleBasedSink sink,
                              TripleComparator tripleComparator,TripleHashFunction tripleHashFunction){
@@ -50,13 +53,11 @@ public class DeduplicationImpl {
 
         Set<CrawleableUri> oldUrisForComparison = new HashSet<>();
 //        uriHashCustodian.getUrisWithSameHashValues(hashValuesOfNewUris);
-//        Set<CrawleableUri> oldUrisForComparison = new HashSet<>();
-//        for (CrawleableUri uri : uris) {
-//            oldUrisForComparison.add(uri);
-//        }
-        for(CrawleableUri uri:uris){
+
+        for(CrawleableUri uri: uris){
             oldUrisForComparison.add(uri);
         }
+
 
 
         for (CrawleableUri uriNew : uris) {

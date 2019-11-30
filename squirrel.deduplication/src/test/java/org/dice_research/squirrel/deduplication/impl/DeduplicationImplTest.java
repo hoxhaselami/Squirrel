@@ -12,6 +12,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.dice_research.squirrel.Constants;
 import org.dice_research.squirrel.data.uri.CrawleableUri;
+import org.dice_research.squirrel.deduplication.hashing.HashValue;
 import org.dice_research.squirrel.deduplication.hashing.impl.SimpleTripleComparator;
 import org.dice_research.squirrel.deduplication.hashing.impl.SimpleTripleHashFunction;
 import org.dice_research.squirrel.metadata.CrawlingActivity;
@@ -30,6 +31,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class DeduplicationImplTest {
@@ -89,60 +91,23 @@ public class DeduplicationImplTest {
 
         sparqlBasedSink.getTriplesForGraph(uri1);
 
+        List<Triple> triplesBefore1 = sparqlBasedSink.getTriplesForGraph(uri1);
+        List<Triple> triplesBefore2 = sparqlBasedSink.getTriplesForGraph(uri2);
+
         List<CrawleableUri> uris = new ArrayList<>();
         uris.add(uri1);
         uris.add(uri2);
 
         deduplicationImpl.handleNewUris(uris);
 
-//        List<Triple> triplesURI1 = sparqlBasedSink.getTriplesForGraph(uri1);
-//        List<Triple> triplesURI2 = sparqlBasedSink.getTriplesForGraph(uri2);
+        List<Triple> triplesAfter1 = sparqlBasedSink.getTriplesForGraph(uri1);
+        List<Triple> triplesAfter2 = sparqlBasedSink.getTriplesForGraph(uri2);
 
-        /**Here we make the attempt to delete the data*/
-//        Query delete = QueryGenerator.getInstance().getSelectQuery(SparqlBasedSink.getGraphId(uri1));
-//        String graphID = SparqlBasedSink.getGraphId(uri1);//
-//        String querybuilder = "DROP GRAPH <"+ SparqlBasedSink.getGraphId(uri1) +"> ;";
-//        UpdateRequest request = UpdateFactory.create(querybuilder.toString());
-//        UpdateAction.execute(request, dataset) ;
+        Assert.assertEquals(2,triplesBefore1.size());
+        Assert.assertEquals(0,triplesAfter1.size());
+        Assert.assertEquals(2,triplesBefore2);
+        Assert.assertEquals(0,triplesAfter2);
 
-
-
-/**
- *
- * Here is the query that sees if the data was deleted
- * */
-        Query selectQuery = QueryGenerator.getInstance().getSelectQuery(SparqlBasedSink.getGraphId(uri1));
-        QueryExecution qe = queryExecFactory.createQueryExecution(selectQuery);
-        ResultSet rs = qe.execSelect();
-        List<Triple> triplesFound = new ArrayList<>();
-        while (rs.hasNext()) {
-            QuerySolution sol = rs.nextSolution();
-            RDFNode subject = sol.get("subject");
-            RDFNode predicate = sol.get("predicate");
-            RDFNode object = sol.get("object");
-            triplesFound.add(Triple.create(subject.asNode(), predicate.asNode(), object.asNode()));
-        }
-        qe.close();
-
-/**
- * Here is a query that shows if the graph exists anymore
- * */
-//        String askquery = "ASK WHERE { GRAPH <"+ SparqlBasedSink.getGraphId(uri1)+"> { ?s ?p ?o } }";
-//
-//        Query query = QueryFactory.create(askquery) ;
-//        QueryExecution qexec = queryExecFactory.createQueryExecution(query) ;
-//        boolean result = qexec.execAsk() ;
-//        qexec.close();
-
-
-
-
-
-
-//      Assert.assertTrue(!result);
-
-        Assert.assertEquals(0,triplesFound.size());
-//
 //        Assert.assertEquals(2,sparqlBasedSink.getTriplesForGraph(uri2));
 //        Assert.assertEquals(2, activity1.getNumberOfTriples());
 //        Assert.assertEquals(2, activity2.getNumberOfTriples());

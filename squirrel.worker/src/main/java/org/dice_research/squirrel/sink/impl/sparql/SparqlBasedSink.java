@@ -214,6 +214,10 @@ public class SparqlBasedSink extends AbstractBufferingTripleBasedSink implements
         openSinkForUri(metadataGraphUri);
     }
 
+    public CrawleableUri getMetadataGraphUri(){
+        return this.metadataGraphUri;
+    }
+
     public void removeTriplesForGraph(CrawleableUri uri){
         String querybuilder = "DROP GRAPH <"+ SparqlBasedSink.getGraphId(uri) +"> ;";
         UpdateRequest request = UpdateFactory.create(querybuilder.toString());

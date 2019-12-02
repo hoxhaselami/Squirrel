@@ -29,4 +29,6 @@ public interface AdvancedTripleBasedSink extends TripleBasedSink {
     void sendTriples(CrawleableUri uri, Collection<Triple> triples);
 
     void removeTriplesForGraph(CrawleableUri uri);
+
+    public CrawleableUri getMetadataGraphUri();
 }

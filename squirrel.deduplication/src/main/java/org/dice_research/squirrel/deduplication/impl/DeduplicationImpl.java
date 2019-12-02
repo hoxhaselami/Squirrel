@@ -1,6 +1,12 @@
 package org.dice_research.squirrel.deduplication.impl;
 
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.tdb.store.Hash;
 import org.dice_research.squirrel.Constants;
 import org.dice_research.squirrel.data.uri.CrawleableUri;
 import org.dice_research.squirrel.deduplication.hashing.HashValue;
@@ -9,11 +15,9 @@ import org.dice_research.squirrel.deduplication.hashing.TripleHashFunction;
 import org.dice_research.squirrel.deduplication.hashing.UriHashCustodian;
 import org.dice_research.squirrel.deduplication.hashing.impl.IntervalBasedMinHashFunction;
 import org.dice_research.squirrel.sink.tripleBased.AdvancedTripleBasedSink;
+import org.dice_research.squirrel.vocab.Squirrel;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class DeduplicationImpl {
 
@@ -25,7 +29,7 @@ public class DeduplicationImpl {
 
     private TripleHashFunction tripleHashFunction;
 
-    private HashMap<CrawleableUri,HashValue> hashes = new HashMap<>();
+    private Hashtable<CrawleableUri,HashValue> hashes = new Hashtable<>();
 
     public DeduplicationImpl(AdvancedTripleBasedSink sink,
                              TripleComparator tripleComparator,TripleHashFunction tripleHashFunction){
@@ -46,19 +50,14 @@ public class DeduplicationImpl {
 //            ((RDBKnownUriFilter) uriHashCustodian).openConnector();
 //        }
 
-        Set<HashValue> hashValuesOfNewUris = new HashSet<>();
-        for (CrawleableUri uri : uris) {
-            hashValuesOfNewUris.add((HashValue) uri.getData(Constants.URI_HASH_KEY));
-        }
 
-        Set<CrawleableUri> oldUrisForComparison = new HashSet<>();
+
 //        uriHashCustodian.getUrisWithSameHashValues(hashValuesOfNewUris);
 
-        for(CrawleableUri uri: uris){
-            oldUrisForComparison.add(uri);
+        HashSet<CrawleableUri> oldUrisForComparison = new HashSet<>();
+        for(CrawleableUri uri : uris){
+
         }
-
-
 
         for (CrawleableUri uriNew : uris) {
             for (CrawleableUri uriOld : oldUrisForComparison) {
@@ -80,16 +79,21 @@ public class DeduplicationImpl {
 
     public void handleNewUris(List<CrawleableUri> uris) {
 
+
+        HashSet<HashValue> hashValues = new HashSet<>();
         for (CrawleableUri nextUri : uris) {
             List<Triple> triples = sink.getTriplesForGraph(nextUri);
             HashValue value = (new IntervalBasedMinHashFunction(2, tripleHashFunction).hash(triples));
             nextUri.addData(Constants.URI_HASH_KEY, value);
+
+            hashValues.add(value);
         }
 
-
         compareNewUrisWithOldUris(uris);
-//        uriHashCustodian.addHashValuesForUris(uris);
 
+        sink.getMetadataGraphUri().addData(Constants.HASH_VALUES,hashValues);
+
+//        uriHashCustodian.addHashValuesForUris(uris);
 
     }
 }

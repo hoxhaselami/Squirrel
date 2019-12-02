@@ -39,6 +39,7 @@ public class Constants {
 
     public static final String URI_HASH_KEY = "HashValue";
     public static final String UUID_KEY = "UUID";
+    public static final String HASH_VALUES = "HASH_VALUES";
 
     /**
      * The preferred date for recrawling a URI is assumed to be a timestamp (in ms
@@ -60,11 +61,11 @@ public class Constants {
     //////////////////////////////////////////////////
     // Component constants
     //////////////////////////////////////////////////
-    
+
     public static final String DEDUPLICATION_ACTIVE_KEY = "DEDUPLICATION_ACTIVE";
 
     public static final String RDB_HOST_NAME_KEY = "RDB_HOST_NAME";
-    
+
     public static final String RDB_PORT_KEY = "RDB_PORT";
 
     public static final boolean DEFAULT_DEDUPLICATION_ACTIVE = false;
@@ -78,4 +79,6 @@ public class Constants {
 
     public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     public static final String DEFAULT_USER_AGENT = "Squirrel";
+
+    public static final String URI_WITH_HASH_VALUES = "URI_WITH_HASH_VALUES";
 }

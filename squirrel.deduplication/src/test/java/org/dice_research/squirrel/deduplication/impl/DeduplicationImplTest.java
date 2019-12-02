@@ -32,6 +32,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 public class DeduplicationImplTest {
@@ -75,8 +76,8 @@ public class DeduplicationImplTest {
         Triple triple2 = new Triple(Squirrel.ResultGraph.asNode(), RDF.value.asNode(),
             ResourceFactory.createTypedLiteral("3.14", XSDDatatype.XSDdouble).asNode());
 
-        Triple triple3 = new Triple(Squirrel.ResultGraph.asNode(), RDF.value.asNode(),
-            ResourceFactory.createTypedLiteral("3.1434", XSDDatatype.XSDdouble).asNode());
+        //Triple triple3 = new Triple(Squirrel.ResultGraph.asNode(), RDF.value.asNode(),
+        //    ResourceFactory.createTypedLiteral("3.1434", XSDDatatype.XSDdouble).asNode());
 
 
         sparqlBasedSink.openSinkForUri(uri1);
@@ -86,10 +87,8 @@ public class DeduplicationImplTest {
 
         sparqlBasedSink.openSinkForUri(uri2);
         sparqlBasedSink.addTriple(uri2, triple1);
-        sparqlBasedSink.addTriple(uri2, triple3);
+        sparqlBasedSink.addTriple(uri2, triple2);
         sparqlBasedSink.closeSinkForUri(uri2);
-
-        sparqlBasedSink.getTriplesForGraph(uri1);
 
         List<Triple> triplesBefore1 = sparqlBasedSink.getTriplesForGraph(uri1);
         List<Triple> triplesBefore2 = sparqlBasedSink.getTriplesForGraph(uri2);
@@ -105,8 +104,8 @@ public class DeduplicationImplTest {
 
         Assert.assertEquals(2,triplesBefore1.size());
         Assert.assertEquals(0,triplesAfter1.size());
-        Assert.assertEquals(2,triplesBefore2);
-        Assert.assertEquals(0,triplesAfter2);
+        Assert.assertEquals(2,triplesBefore2.size());
+        Assert.assertEquals(0,triplesAfter2.size());
 
 //        Assert.assertEquals(2,sparqlBasedSink.getTriplesForGraph(uri2));
 //        Assert.assertEquals(2, activity1.getNumberOfTriples());

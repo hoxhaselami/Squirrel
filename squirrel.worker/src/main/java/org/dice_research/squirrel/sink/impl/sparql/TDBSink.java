@@ -147,6 +147,11 @@ public class TDBSink extends AbstractBufferingTripleBasedSink implements Advance
     }
 
     @Override
+    public CrawleableUri getMetadataGraphUri() {
+        return null;
+    }
+
+    @Override
     public void addMetaData(Model model) {
         metaDataGraphUri = new CrawleableUri(Constants.DEFAULT_META_DATA_GRAPH_URI);
         StmtIterator iterator = model.listStatements();

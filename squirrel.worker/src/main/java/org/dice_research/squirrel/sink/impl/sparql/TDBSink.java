@@ -147,8 +147,8 @@ public class TDBSink extends AbstractBufferingTripleBasedSink implements Advance
     }
 
     @Override
-    public CrawleableUri getMetadataGraphUri() {
-        return null;
+    public void updateGraphForUri(CrawleableUri uriOld,CrawleableUri uriNew) {
+
     }
 
     @Override

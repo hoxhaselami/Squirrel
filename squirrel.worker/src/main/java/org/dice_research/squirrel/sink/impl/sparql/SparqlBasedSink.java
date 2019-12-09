@@ -118,11 +118,11 @@ public class SparqlBasedSink extends AbstractBufferingTripleBasedSink implements
     @Override
     public List<Triple> getTriplesForGraph(CrawleableUri uri) {
         Query selectQuery = null;
-         if (uri.equals(metadataGraphUri)) {
-        selectQuery = QueryGenerator.getInstance().getSelectQuery();
-         } else {
-         selectQuery = QueryGenerator.getInstance().getSelectQuery(getGraphId(uri));
-         }
+        if (uri.equals(metadataGraphUri)) {
+            selectQuery = QueryGenerator.getInstance().getSelectQuery();
+        } else {
+            selectQuery = QueryGenerator.getInstance().getSelectQuery(getGraphId(uri));
+        }
 
         QueryExecution qe = queryExecFactory.createQueryExecution(selectQuery);
         ResultSet rs = qe.execSelect();
@@ -153,10 +153,8 @@ public class SparqlBasedSink extends AbstractBufferingTripleBasedSink implements
     /**
      * Method to send all buffered triples to the database
      *
-     * @param uri
-     *            the crawled {@link CrawleableUri}
-     * @param triples
-     *            the list of {@link Triple}s regarding that uri
+     * @param uri     the crawled {@link CrawleableUri}
+     * @param triples the list of {@link Triple}s regarding that uri
      */
     @Override
     public void sendTriples(CrawleableUri uri, Collection<Triple> triples) {
@@ -172,7 +170,7 @@ public class SparqlBasedSink extends AbstractBufferingTripleBasedSink implements
             insert.setHasInsertClause(true);
             insert.setHasDeleteClause(false);
             QuadAcc quads = insert.getInsertAcc();
-            for(Triple triple : triples){
+            for (Triple triple : triples) {
                 quads.addQuad(new Quad(graph, triple));
             }
             quads.setGraph(graph);
@@ -196,8 +194,7 @@ public class SparqlBasedSink extends AbstractBufferingTripleBasedSink implements
     /**
      * Get the id of the graph in which the given uri is stored.
      *
-     * @param uri
-     *            The given uri.
+     * @param uri The given uri.
      * @return The id of the graph.
      */
     public static String getGraphId(CrawleableUri uri) {
@@ -214,14 +211,41 @@ public class SparqlBasedSink extends AbstractBufferingTripleBasedSink implements
         openSinkForUri(metadataGraphUri);
     }
 
-    public CrawleableUri getMetadataGraphUri(){
-        return this.metadataGraphUri;
-    }
 
-    public void removeTriplesForGraph(CrawleableUri uri){
-        String querybuilder = "DROP GRAPH <"+ SparqlBasedSink.getGraphId(uri) +"> ;";
+    public void removeTriplesForGraph(CrawleableUri uri) {
+        String querybuilder = "DROP GRAPH <" + SparqlBasedSink.getGraphId(uri) + "> ;";
         UpdateRequest request = UpdateFactory.create(querybuilder.toString());
         updateExecFactory.createUpdateProcessor(request).execute();
+    }
+
+    @Override
+    public void updateGraphForUri(CrawleableUri uriOld, CrawleableUri uriNew) {
+        try {
+            Node graph;
+            if (uriOld.equals(metadataGraphUri)) {
+                graph = NodeFactory.createURI(uriOld.getUri().toString());
+            } else {
+                graph = NodeFactory.createURI(getGraphId(uriOld));
+            }
+
+            UpdateDeleteInsert insert = new UpdateDeleteInsert();
+            insert.setHasInsertClause(true);
+            insert.setHasDeleteClause(false);
+            QuadAcc quads = insert.getInsertAcc();
+//            for(Triple triple : triples){
+//                quads.addQuad(new Quad(graph, triple));
+//            }
+            quads.setGraph(graph);
+            UpdateProcessor processor = updateExecFactory.createUpdateProcessor(
+                new UpdateRequest(insert).toString()
+                    .replaceAll("\\{\\}", ""
+                        + "{ SELECT * {OPTIONAL {?s ?p ?o} } LIMIT 1}")
+            );
+//            LOGGER.info("Storing " + triples.size() + " triples for URI: " + uri.getUri().toString());
+            processor.execute();
+        } catch (Exception e) {
+            LOGGER.error("Exception while sending update query.", e);
+        }
     }
 
     @Override

@@ -30,5 +30,5 @@ public interface AdvancedTripleBasedSink extends TripleBasedSink {
 
     void removeTriplesForGraph(CrawleableUri uri);
 
-    public CrawleableUri getMetadataGraphUri();
+    void updateGraphForUri(CrawleableUri uriOld, CrawleableUri uriNew);
 }

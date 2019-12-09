@@ -12,11 +12,9 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.dice_research.squirrel.Constants;
 import org.dice_research.squirrel.data.uri.CrawleableUri;
-import org.dice_research.squirrel.deduplication.hashing.HashValue;
 import org.dice_research.squirrel.deduplication.hashing.impl.SimpleTripleComparator;
 import org.dice_research.squirrel.deduplication.hashing.impl.SimpleTripleHashFunction;
 import org.dice_research.squirrel.metadata.CrawlingActivity;
-import org.dice_research.squirrel.sink.impl.sparql.QueryGenerator;
 import org.dice_research.squirrel.sink.impl.sparql.SparqlBasedSink;
 import org.dice_research.squirrel.vocab.Squirrel;
 
@@ -25,14 +23,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 public class DeduplicationImplTest {
@@ -88,6 +82,7 @@ public class DeduplicationImplTest {
         sparqlBasedSink.openSinkForUri(uri2);
         sparqlBasedSink.addTriple(uri2, triple1);
         sparqlBasedSink.addTriple(uri2, triple2);
+
         sparqlBasedSink.closeSinkForUri(uri2);
 
         List<Triple> triplesBefore1 = sparqlBasedSink.getTriplesForGraph(uri1);
@@ -101,6 +96,8 @@ public class DeduplicationImplTest {
 
         List<Triple> triplesAfter1 = sparqlBasedSink.getTriplesForGraph(uri1);
         List<Triple> triplesAfter2 = sparqlBasedSink.getTriplesForGraph(uri2);
+
+        //Our test should consider the changes that are shown from the metadatagraph.
 
         Assert.assertEquals(2,triplesBefore1.size());
         Assert.assertEquals(0,triplesAfter1.size());

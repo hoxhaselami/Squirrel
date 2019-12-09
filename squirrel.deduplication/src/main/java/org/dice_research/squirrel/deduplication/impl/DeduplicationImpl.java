@@ -56,7 +56,7 @@ public class DeduplicationImpl {
 
         HashSet<CrawleableUri> oldUrisForComparison = new HashSet<>();
         for(CrawleableUri uri : uris){
-
+            oldUrisForComparison.add(uri);
         }
 
         for (CrawleableUri uriNew : uris) {
@@ -70,6 +70,8 @@ public class DeduplicationImpl {
                         // TODO: delete duplicate, this means Delete the triples from the new uris and
                         // replace them by a link to the old uris which has the same content
                         sink.removeTriplesForGraph(uriNew);
+                        uriNew.addData(Constants.UUID_KEY,uriOld.getData(Constants.UUID_KEY));
+                        //sink.addLinkToMetadataGraph(uriNew,uriOld)
                     }
                 }
             }
@@ -78,22 +80,14 @@ public class DeduplicationImpl {
 
 
     public void handleNewUris(List<CrawleableUri> uris) {
-
-
-        HashSet<HashValue> hashValues = new HashSet<>();
         for (CrawleableUri nextUri : uris) {
             List<Triple> triples = sink.getTriplesForGraph(nextUri);
             HashValue value = (new IntervalBasedMinHashFunction(2, tripleHashFunction).hash(triples));
             nextUri.addData(Constants.URI_HASH_KEY, value);
-
-            hashValues.add(value);
         }
 
         compareNewUrisWithOldUris(uris);
 
-        sink.getMetadataGraphUri().addData(Constants.HASH_VALUES,hashValues);
-
 //        uriHashCustodian.addHashValuesForUris(uris);
-
     }
 }

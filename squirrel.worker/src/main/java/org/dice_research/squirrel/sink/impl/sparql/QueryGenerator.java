@@ -2,10 +2,13 @@ package org.dice_research.squirrel.sink.impl.sparql;
 
 import java.util.Collection;
 
+import opennlp.tools.parser.Cons;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
+import org.dice_research.squirrel.Constants;
+import org.dice_research.squirrel.data.uri.CrawleableUri;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -168,5 +171,29 @@ public class QueryGenerator {
         }
         stringBuilder.append(" ");
         return stringBuilder.toString();
+    }
+
+    private Query updateGraphIDForDuplicate(CrawleableUri newUri, CrawleableUri oldUri){
+
+        String oldGraphID = Constants.DEFAULT_RESULT_GRAPH_URI_PREFIX + oldUri.getData(Constants.UUID_KEY).toString();
+
+        String newGraphID = Constants.DEFAULT_RESULT_GRAPH_URI_PREFIX + newUri.getData(Constants.UUID_KEY).toString();
+
+
+        StringBuilder queryAsString = new StringBuilder();
+        queryAsString.append("WITH <");
+        queryAsString.append(oldGraphID);
+        queryAsString.append("> { ");
+        queryAsString.append("DELETE {  }");
+        queryAsString.append("INSERT {}");
+        queryAsString.append("WHERE {");
+        queryAsString.append("");
+        queryAsString.append("}");
+
+
+
+
+        Query query = QueryFactory.create(queryAsString.toString());
+        return query;
     }
 }

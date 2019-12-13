@@ -70,8 +70,7 @@ public class DeduplicationImpl {
                         // TODO: delete duplicate, this means Delete the triples from the new uris and
                         // replace them by a link to the old uris which has the same content
                         sink.removeTriplesForGraph(uriNew);
-                        uriNew.addData(Constants.UUID_KEY,uriOld.getData(Constants.UUID_KEY));
-                        //sink.addLinkToMetadataGraph(uriNew,uriOld)
+//                        sink.updateGraphForUri(uriOld,uriNew);
                     }
                 }
             }
@@ -84,6 +83,7 @@ public class DeduplicationImpl {
             List<Triple> triples = sink.getTriplesForGraph(nextUri);
             HashValue value = (new IntervalBasedMinHashFunction(2, tripleHashFunction).hash(triples));
             nextUri.addData(Constants.URI_HASH_KEY, value);
+//            sink.addHashValue(nextUri);
         }
 
         compareNewUrisWithOldUris(uris);

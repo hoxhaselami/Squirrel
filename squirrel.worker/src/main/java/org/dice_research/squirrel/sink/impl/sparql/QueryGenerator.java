@@ -173,7 +173,7 @@ public class QueryGenerator {
         return stringBuilder.toString();
     }
 
-    private Query updateGraphIDForDuplicate(CrawleableUri newUri, CrawleableUri oldUri){
+    public Query getUpdateQuery(CrawleableUri metadata,CrawleableUri newUri, CrawleableUri oldUri){
 
         String oldGraphID = Constants.DEFAULT_RESULT_GRAPH_URI_PREFIX + oldUri.getData(Constants.UUID_KEY).toString();
 
@@ -181,6 +181,9 @@ public class QueryGenerator {
 
 
         StringBuilder queryAsString = new StringBuilder();
+        queryAsString.append("FROM <");
+        queryAsString.append(metadata);
+        queryAsString.append("> {}");
         queryAsString.append("WITH <");
         queryAsString.append(oldGraphID);
         queryAsString.append("> { ");

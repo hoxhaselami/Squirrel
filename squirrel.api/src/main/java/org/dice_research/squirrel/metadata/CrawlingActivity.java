@@ -10,6 +10,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -65,6 +66,11 @@ public class CrawlingActivity implements Serializable {
     private CrawlingURIState state;
 
     /**
+     * The graph associated with the crawled triples
+     * */
+    private  String graphID;
+
+    /**
      * URI of the worker assigned carrying out this activity.
      */
     private String workerUri;
@@ -87,7 +93,9 @@ public class CrawlingActivity implements Serializable {
         this.uri = uri;
         this.state = CrawlingURIState.UNKNOWN;
         activityUri = Constants.DEFAULT_ACTIVITY_URI_PREFIX + uri.getData(Constants.UUID_KEY).toString();
+        graphID = Constants.DEFAULT_RESULT_GRAPH_URI_PREFIX + uri.getData(Constants.UUID_KEY).toString();
         uri.addData(Constants.URI_CRAWLING_ACTIVITY_URI, activityUri);
+        uri.addData(Constants.URI_GRAPH,graphID);
     }
 
     public void setState(CrawlingURIState state) {
@@ -120,6 +128,7 @@ public class CrawlingActivity implements Serializable {
         }
 
         model.add(activity, Squirrel.status, model.createTypedLiteral(getState().toString()));
+        model.add(activity, Squirrel.graphID, model.createResource(graphID));
         model.add(activity, PROV_O.startedAtTime, model.createTypedLiteral(dateStarted));
         model.add(activity, PROV_O.endedAtTime, model.createTypedLiteral(dateEnded));
         model.add(activity, Squirrel.approxNumberOfTriples, model.createTypedLiteral(numberOfTriples));

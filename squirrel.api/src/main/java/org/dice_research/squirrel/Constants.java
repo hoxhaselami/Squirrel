@@ -39,7 +39,7 @@ public class Constants {
 
     public static final String URI_HASH_KEY = "HashValue";
     public static final String UUID_KEY = "UUID";
-    public static final String HASH_VALUES = "HASH_VALUES";
+    public static final String URI_GRAPH = "graphID";
 
     /**
      * The preferred date for recrawling a URI is assumed to be a timestamp (in ms
@@ -79,6 +79,4 @@ public class Constants {
 
     public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     public static final String DEFAULT_USER_AGENT = "Squirrel";
-
-    public static final String URI_WITH_HASH_VALUES = "URI_WITH_HASH_VALUES";
 }

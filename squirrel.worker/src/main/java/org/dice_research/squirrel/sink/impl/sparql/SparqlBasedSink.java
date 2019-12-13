@@ -198,7 +198,7 @@ public class SparqlBasedSink extends AbstractBufferingTripleBasedSink implements
      * @return The id of the graph.
      */
     public static String getGraphId(CrawleableUri uri) {
-        return Constants.DEFAULT_RESULT_GRAPH_URI_PREFIX + uri.getData(Constants.UUID_KEY).toString();
+        return uri.getData(Constants.URI_GRAPH).toString();
     }
 
     public void setMetadataGraphUri(CrawleableUri metadataGraphUri) {
@@ -213,39 +213,20 @@ public class SparqlBasedSink extends AbstractBufferingTripleBasedSink implements
 
 
     public void removeTriplesForGraph(CrawleableUri uri) {
-        String querybuilder = "DROP GRAPH <" + SparqlBasedSink.getGraphId(uri) + "> ;";
+        String querybuilder = "DROP GRAPH <" + getGraphId(uri) + "> ;";
         UpdateRequest request = UpdateFactory.create(querybuilder.toString());
         updateExecFactory.createUpdateProcessor(request).execute();
     }
 
     @Override
     public void updateGraphForUri(CrawleableUri uriOld, CrawleableUri uriNew) {
-        try {
-            Node graph;
-            if (uriOld.equals(metadataGraphUri)) {
-                graph = NodeFactory.createURI(uriOld.getUri().toString());
-            } else {
-                graph = NodeFactory.createURI(getGraphId(uriOld));
-            }
 
-            UpdateDeleteInsert insert = new UpdateDeleteInsert();
-            insert.setHasInsertClause(true);
-            insert.setHasDeleteClause(false);
-            QuadAcc quads = insert.getInsertAcc();
-//            for(Triple triple : triples){
-//                quads.addQuad(new Quad(graph, triple));
-//            }
-            quads.setGraph(graph);
-            UpdateProcessor processor = updateExecFactory.createUpdateProcessor(
-                new UpdateRequest(insert).toString()
-                    .replaceAll("\\{\\}", ""
-                        + "{ SELECT * {OPTIONAL {?s ?p ?o} } LIMIT 1}")
-            );
-//            LOGGER.info("Storing " + triples.size() + " triples for URI: " + uri.getUri().toString());
-            processor.execute();
-        } catch (Exception e) {
-            LOGGER.error("Exception while sending update query.", e);
-        }
+//            UpdateDeleteInsert update = new UpdateDeleteInsert();
+//            update.setHasInsertClause(true);
+//            update.setHasDeleteClause(true);
+//            String query = QueryGenerator.getInstance().getUpdateQuery(metadataGraphUri,uriOld,uriNew).toString();
+//            UpdateRequest request = UpdateFactory.create(query);
+
     }
 
     @Override

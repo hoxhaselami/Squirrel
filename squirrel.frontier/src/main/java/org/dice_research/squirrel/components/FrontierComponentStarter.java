@@ -16,19 +16,19 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
  */
 
 public class FrontierComponentStarter {
-    
+
     private static final int ERROR_EXIT_CODE = 1;
-    
+
     private static FileSystemXmlApplicationContext context;
 
     private static Component component;
 
     private static boolean closed = false;
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(FrontierComponentStarter.class);
 
 
-    
+
     public static void main(String[] args) {
         addShutdownHook();
         boolean success = true;
@@ -36,7 +36,7 @@ public class FrontierComponentStarter {
         context = new FileSystemXmlApplicationContext(File.separator + System.getenv("FRONTIER_CONTEXT_CONFIG_FILE"));
         component = (Component) context.getBean("frontierComponent");
         component.init();
-        
+
         component.run();
         } catch (Throwable t) {
             LOGGER.error("Exception while executing component. Exiting with error code.", t);
@@ -50,7 +50,7 @@ public class FrontierComponentStarter {
         }
 
     }
-    
+
     private static synchronized void closeComponent() {
         if (!closed) {
             Closer.close(component, LOGGER);

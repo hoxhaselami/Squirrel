@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.sun.xml.bind.v2.runtime.reflect.opt.Const;
+import opennlp.tools.parser.Cons;
 import org.aksw.jena_sparql_api.core.QueryExecutionFactory;
 import org.aksw.jena_sparql_api.core.UpdateExecutionFactory;
 import org.aksw.jena_sparql_api.core.UpdateExecutionFactoryHttp;
@@ -198,7 +200,7 @@ public class SparqlBasedSink extends AbstractBufferingTripleBasedSink implements
      * @return The id of the graph.
      */
     public static String getGraphId(CrawleableUri uri) {
-        return uri.getData(Constants.URI_GRAPH).toString();
+        return Constants.DEFAULT_RESULT_GRAPH_URI_PREFIX + uri.getData(Constants.UUID_KEY).toString();
     }
 
     public void setMetadataGraphUri(CrawleableUri metadataGraphUri) {
@@ -220,12 +222,34 @@ public class SparqlBasedSink extends AbstractBufferingTripleBasedSink implements
 
     @Override
     public void updateGraphForUri(CrawleableUri uriOld, CrawleableUri uriNew) {
-
-//            UpdateDeleteInsert update = new UpdateDeleteInsert();
-//            update.setHasInsertClause(true);
-//            update.setHasDeleteClause(true);
+            UpdateDeleteInsert update = new UpdateDeleteInsert();
+            update.setHasInsertClause(true);
+            update.setHasDeleteClause(true);
 //            String query = QueryGenerator.getInstance().getUpdateQuery(metadataGraphUri,uriOld,uriNew).toString();
-//            UpdateRequest request = UpdateFactory.create(query);
+//            String query = "FROM <"+metadataGraphUri+">";
+            UpdateRequest request = UpdateFactory.create();
+        request.add("PREFIX sq: <http://w3id.org/squirrel/vocab#>\n" +
+            "PREFIX sq-a:  <http://w3id.org/squirrel/activity#>" +
+            "PREFIX sq-g:  <http://w3id.org/squirrel/graph#>" +
+            "\n" +
+            "WITH <" +
+            Constants.DEFAULT_META_DATA_GRAPH_URI +
+            ">\n" +
+            "DELETE { " +
+            "sq-a:" +
+            getGraphId(uriNew) +
+            "?s " +
+            "}\n" +
+            "INSERT { " +
+            uriNew.getData(Constants.URI_CRAWLING_ACTIVITY) +
+            getGraphId(uriNew)+
+            "sq-g:"+ uriOld.getData(Constants.UUID_KEY) +
+            "}\n" +
+            "WHERE\n" +
+            "  { ?s ?p ?o\n" +
+            "  } ");
+
+        updateExecFactory.createUpdateProcessor(request).execute();
 
     }
 

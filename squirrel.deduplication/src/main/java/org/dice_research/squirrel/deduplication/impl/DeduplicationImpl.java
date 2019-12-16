@@ -70,7 +70,7 @@ public class DeduplicationImpl {
                         // TODO: delete duplicate, this means Delete the triples from the new uris and
                         // replace them by a link to the old uris which has the same content
                         sink.removeTriplesForGraph(uriNew);
-//                        sink.updateGraphForUri(uriOld,uriNew);
+                        sink.updateGraphForUri(uriOld,uriNew);
                     }
                 }
             }

@@ -15,6 +15,7 @@ import org.dice_research.squirrel.data.uri.CrawleableUri;
 import org.dice_research.squirrel.deduplication.hashing.impl.SimpleTripleComparator;
 import org.dice_research.squirrel.deduplication.hashing.impl.SimpleTripleHashFunction;
 import org.dice_research.squirrel.metadata.CrawlingActivity;
+import org.dice_research.squirrel.sink.impl.sparql.QueryGenerator;
 import org.dice_research.squirrel.sink.impl.sparql.SparqlBasedSink;
 import org.dice_research.squirrel.vocab.Squirrel;
 
@@ -103,6 +104,7 @@ public class DeduplicationImplTest {
         Assert.assertEquals(0,triplesAfter1.size());
         Assert.assertEquals(2,triplesBefore2.size());
         Assert.assertEquals(0,triplesAfter2.size());
+
 
 //        Assert.assertEquals(2,sparqlBasedSink.getTriplesForGraph(uri2));
 //        Assert.assertEquals(2, activity1.getNumberOfTriples());

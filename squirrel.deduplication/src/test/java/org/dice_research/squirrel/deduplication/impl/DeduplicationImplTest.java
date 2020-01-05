@@ -31,6 +31,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DeduplicationImplTest {
+
+    Model testModel = ModelFactory.createDefaultModel();
+
+
     private SparqlBasedSink sparqlBasedSink;
     QueryExecutionFactory queryExecFactory;
     UpdateExecutionFactory updateExecFactory;
@@ -79,11 +83,11 @@ public class DeduplicationImplTest {
         sparqlBasedSink.addTriple(uri1, triple1);
         sparqlBasedSink.addTriple(uri1, triple2);
         sparqlBasedSink.closeSinkForUri(uri1);
-
+//
         sparqlBasedSink.openSinkForUri(uri2);
         sparqlBasedSink.addTriple(uri2, triple1);
         sparqlBasedSink.addTriple(uri2, triple2);
-
+//
         sparqlBasedSink.closeSinkForUri(uri2);
 
         List<Triple> triplesBefore1 = sparqlBasedSink.getTriplesForGraph(uri1);
@@ -106,8 +110,8 @@ public class DeduplicationImplTest {
         Assert.assertEquals(0,triplesAfter2.size());
 
 
-//        Assert.assertEquals(2,sparqlBasedSink.getTriplesForGraph(uri2));
-//        Assert.assertEquals(2, activity1.getNumberOfTriples());
-//        Assert.assertEquals(2, activity2.getNumberOfTriples());
+        Assert.assertEquals(2,sparqlBasedSink.getTriplesForGraph(uri2));
+        Assert.assertEquals(2, activity1.getNumberOfTriples());
+        Assert.assertEquals(2, activity2.getNumberOfTriples());
     }
 }

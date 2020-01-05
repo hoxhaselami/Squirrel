@@ -236,14 +236,14 @@ public class SparqlBasedSink extends AbstractBufferingTripleBasedSink implements
             Constants.DEFAULT_META_DATA_GRAPH_URI +
             ">\n" +
             "DELETE { " +
-            "sq-a:" +
-            getGraphId(uriNew) +
+            "sq-a:"+uriNew.getData(Constants.UUID_KEY) +
+            Squirrel.containsDataOf  +  //Squirrel.Graph
             "?s " +
             "}\n" +
             "INSERT { " +
-            uriNew.getData(Constants.URI_CRAWLING_ACTIVITY) +
-            getGraphId(uriNew)+
-            "sq-g:"+ uriOld.getData(Constants.UUID_KEY) +
+            "sq-a:"+uriNew.getData(Constants.UUID_KEY) +
+            Squirrel.containsDataOf +
+//            uriOld.getData(Constants.GRAPH)  +  //Squirrel.Graph
             "}\n" +
             "WHERE\n" +
             "  { ?s ?p ?o\n" +
